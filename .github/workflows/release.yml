@@ -20,13 +20,17 @@ jobs:
         id: pr_merged
         run: echo "::set-output name=IS_MERGED::$(jq -r .pull_request.merged $GITHUB_EVENT_PATH)"
 
+      - name: Get the latest tag
+        id: get_latest_tag
+        run: echo "::set-output name=TAG::$(git describe --abbrev=0 --tags)"
+
       - name: Create GitHub Release
         if: steps.pr_merged.outputs.IS_MERGED == 'true'
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ github.event.pull_request.base.ref }}
-          release_name: Release ${{ github.event.pull_request.base.ref }}
+          tag_name: ${{ steps.get_latest_tag.outputs.TAG }}
+          release_name: Release ${{ steps.get_latest_tag.outputs.TAG }}
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
