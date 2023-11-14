@@ -20,10 +20,13 @@ jobs:
         id: pr_merged
         run: echo "::set-output name=IS_MERGED::$(jq -r .pull_request.merged $GITHUB_EVENT_PATH)"
 
+      - name: Fetch tags
+        run: git fetch --tags
+
       - name: Get the latest tag
         id: get_latest_tag
         run: |
-          TAG=$(git ls-remote --tags origin | awk -F/ '{print $3}' | sort -V | tail -n 1)
+          TAG=$(git describe --abbrev=0 --tags)
           echo "::set-output name=TAG::$TAG"
 
       - name: Create GitHub Release
