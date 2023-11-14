@@ -28,3 +28,5 @@ jobs:
           release_name: Release ${{ github.event.pull_request.base.ref }}
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
