@@ -22,7 +22,9 @@ jobs:
 
       - name: Get the latest tag
         id: get_latest_tag
-        run: echo "::set-output name=TAG::$(git describe --abbrev=0 --tags)"
+        run: |
+          TAG=$(git ls-remote --tags origin | awk -F/ '{print $3}' | sort -V | tail -n 1)
+          echo "::set-output name=TAG::$TAG"
 
       - name: Create GitHub Release
         if: steps.pr_merged.outputs.IS_MERGED == 'true'
