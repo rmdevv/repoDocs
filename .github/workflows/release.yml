@@ -16,19 +16,17 @@ jobs:
       - name: Check if PR is merged
         id: pr_merged
         run: echo "::set-output name=IS_MERGED::$(jq -r .pull_request.merged $GITHUB_EVENT_PATH)"
-
+      
       - name: Get latest tag
-        id: get_tag
-        run: |
-          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
-          echo "Latest tag is $latest_tag"
-          echo "::set-output name=tag::$latest_tag"
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+        if: ${{ steps.release-label.outputs.level != null }}
 
       - name: Create release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
-          release_name: Release ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ steps.get-latest-tag.outputs.tag }}
+          release_name: ${{ steps.get-latest-tag.outputs.tag }}
           body: |
             Descrizione release.
           draft: false
