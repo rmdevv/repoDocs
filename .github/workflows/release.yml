@@ -20,7 +20,6 @@ jobs:
       - name: Get latest tag
         uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
-        if: ${{ steps.release-label.outputs.level != null }}
 
       - name: Create release
         uses: actions/create-release@v1
