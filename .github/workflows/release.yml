@@ -13,29 +13,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Git
-        run: git config --global user.email "actions@github.com" && git config --global user.name "GitHub Actions"
-
       - name: Check if PR is merged
         id: pr_merged
         run: echo "::set-output name=IS_MERGED::$(jq -r .pull_request.merged $GITHUB_EVENT_PATH)"
 
-      - name: Fetch tags
-        run: git fetch --tags
-
-      - name: Get the latest tag
-        id: get_latest_tag
+      - name: Get latest tag
+        id: get_tag
         run: |
-          TAG=$(git describe --abbrev=0 --tags)
-          echo "::set-output name=TAG::$TAG"
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "Latest tag is $latest_tag"
+          echo "::set-output name=tag::$latest_tag"
 
-      - name: Create GitHub Release
-        if: steps.pr_merged.outputs.IS_MERGED == 'true'
+      - name: Create release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.get_latest_tag.outputs.TAG }}
-          release_name: Release ${{ steps.get_latest_tag.outputs.TAG }}
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: Release ${{ steps.get_tag.outputs.tag }}
+          body: |
+            Descrizione release.
           draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
